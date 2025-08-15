@@ -35,9 +35,9 @@ class VectorData:
     def __init__(self, data: List[List[float]]):
         """Data is of the form of a list of x and y tuples/lists"""
         self.data = data
-        self.c_vals = self.get_c_vals()
+        self.c_vals = self.update_internal_c_vals()
 
-    def get_c_vals(self, min_j=-20, max_j=20):
+    def update_internal_c_vals(self, min_j=-20, max_j=20):
         self.c_vals = [(j, get_c_j(self.data, j))
                        for j in range(min_j, max_j+1)]
 
