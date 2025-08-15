@@ -1,0 +1,41 @@
+15 aug 10:05
+User:
+give me a beautiful poem about a heart math function
+
+Chatgpt:
+Here’s something for you—mathematical but still romantic:
+
+---
+
+**The Function of My Heart**
+
+Let $h(t)$ be my heartbeat,
+a piecewise wave of longing—
+spiking when you near,
+flattening only in your absence.
+
+Its domain is $(-\infty, \infty)$,
+for you entered without warning,
+and the limits as $t \to \pm\infty$
+are still, somehow, you.
+
+Differentiated,
+my love becomes pure velocity—
+each glance from you an impulse
+that sends my slope climbing,
+undampened by distance.
+
+Integrated,
+every moment accumulates:
+the area beneath the curve
+is the sum of every quiet look,
+every word, every silence shared.
+
+And though my function has no closed form,
+you are its solution set—
+the constant of integration
+that makes the graph complete.
+
+---
+
+Do you want me to also make a **visual plot** of this "heart function" so the poem has an actual mathematical curve to match?
