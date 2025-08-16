@@ -134,7 +134,7 @@ class VectorRender(VectorScene):
 
         vectorData = VectorData(data)
 
-        vectorData.update_internal_c_vals(-10, 10)
+        vectorData.update_internal_c_vals(-20, 20)
         vectorData.sort_by_speed()
         vector_info = vectorData.get_c_vals()
         self.num_vecs = vectorData.get_num_vectors()
@@ -145,15 +145,17 @@ class VectorRender(VectorScene):
             self.max_vector_height += np.sqrt(i ** 2 + j ** 2)
         self.max_vector_height *= 4/5
 
+        aspect_ratio = 9/16
+
         self.camera.set_frame_width(2*self.max_vector_height)
-        self.camera.set_frame_height(2*self.max_vector_height)
+        self.camera.set_frame_height(2*self.max_vector_height*aspect_ratio)
 
         axes = Axes(
             x_min=-self.max_vector_height,
             x_max=self.max_vector_height,
             x_step=1,
-            y_min=-self.max_vector_height,
-            y_max=self.max_vector_height,
+            y_min=-self.max_vector_height*aspect_ratio,
+            y_max=self.max_vector_height*aspect_ratio,
             y_step=1,
 
         )
@@ -167,8 +169,8 @@ class VectorRender(VectorScene):
             x_min=-self.max_vector_height,
             x_max=self.max_vector_height,
             x_step=1,
-            y_min=-self.max_vector_height,
-            y_max=self.max_vector_height,
+            y_min=-self.max_vector_height*aspect_ratio,
+            y_max=self.max_vector_height*aspect_ratio,
             y_step=1,
         )
         self.play(ShowCreation(plane))
