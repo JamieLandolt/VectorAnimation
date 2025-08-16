@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+
+{% block head %}
+<title>Fourier Draw</title>
+{% endblock %}
+
+{% block body %}
+<!-- HEADER -->
+<header>
+    <div class="container">
+        <h1>Fourier Draw</h1>
+        <p>Draw a shape and watch it come to life with fourier series</p>
+    </div>
+</header>
+
+<!-- CANVAS -->
+<section id="canvas-section">
+    <div class="container">
+        <canvas id="canvas" width="900" height="700"></canvas>
+        <div class="buttons">
+            <button id="clear-btn">Clear</button>
+            <button id="generate-btn">Generate</button>
+        </div>
+    </div>
+</section>
+{% endblock %}
