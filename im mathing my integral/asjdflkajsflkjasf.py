@@ -5,6 +5,7 @@ import numpy as np
 
 def get_average(vals: List[int]) -> int:
     if len(vals) < 3:
+        # Blud hasn't discovered `raise` yet
         return "error"
     interval_width: int = 1
     # trapezium method
