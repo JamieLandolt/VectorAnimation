@@ -10,4 +10,4 @@ def run_animation(job_id: str = "data", manim_params='-pl'):
     # Write to file read from
     np.save('data.npy', data)
     subprocess.Popen(
-        f"manim {manim_params} animate_from_file.py VectorRender", shell=True)
+        f"manim {manim_params} -o {job_id}.mp4 animate_from_file.py VectorRender", shell=True)

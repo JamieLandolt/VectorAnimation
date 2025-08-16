@@ -133,11 +133,11 @@ class VectorRender(VectorScene):
         data = np.load('data.npy')
 
         vectorData = VectorData(data)
-        self.num_vecs = vectorData.get_num_vectors()
 
         vectorData.update_internal_c_vals(-10, 10)
         vectorData.sort_by_speed()
         vector_info = vectorData.get_c_vals()
+        self.num_vecs = vectorData.get_num_vectors()
 
         # Determine how big frame is
         self.max_vector_height = 0
