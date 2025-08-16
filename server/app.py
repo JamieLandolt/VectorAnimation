@@ -1,4 +1,4 @@
-from flask import Flask, render_template
+from flask import Flask, render_template, request
 from flask_restx import reqparse, Api, Resource
 import uuid
 
@@ -31,18 +31,13 @@ class Job():
 
 job_dict = {}
 
-job_info_args = reqparse.RequestParser()
-job_info_args.add_argument('job_id', type=str, location='json', required=True);
-
 job_creation_args = reqparse.RequestParser()
 job_creation_args.add_argument('points', type=list, location='json', required=True);
 
 @api.route('/job')
 class JobApi(Resource):
-    @api.expect(job_info_args)
     def get(self):
-        args = job_info_args.parse_args()
-        job_id = args['job_id']
+        job_id = request.args.get('job_id')
 
         job = job_dict[job_id]
         return job.get_job_info(), 200

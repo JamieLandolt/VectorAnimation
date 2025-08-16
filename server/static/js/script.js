@@ -22,7 +22,6 @@ window.addEventListener("load", () => {
     function finishPosition() { 
         painting = false; 
         context.beginPath();
-        console.log("Points", points);
     }
 
     function draw(e) {
@@ -53,7 +52,72 @@ window.addEventListener("load", () => {
 
     // CLEAR BUTTON //////////////////////////////////////////////////////////////////////////////
     const clearBtn = document.querySelector("#clear-btn");
-
     clearBtn.addEventListener("click", clearCanvas)
+
+    // GENERATE BUTTON ///////////////////////////////////////////////////////////////////////////
+    let jobId = null;
+    let jobIsDone = false;
+    let intervalId = null;
+    const endpoint = "http://127.0.0.1:5000/api/job";
+
+    const generateBtn = document.querySelector("#generate-btn");
+
+    function sendJobInfoRequest() {
+        if (jobId == null) return;
+
+        const params = {
+            "job_id": jobId
+        }
+
+        const queryString = new URLSearchParams(params).toString();
+        const endpointWithParams = `${endpoint}?${queryString}`;
+        
+        fetch(endpointWithParams, {
+            method: 'GET',
+        })
+            .then(response => {
+                if (!response.ok) console.log("Bad request");
+                else {
+                    return response.json();
+                }
+            })
+            .then(data => {
+                jobIsDone = data["is_done"];
+                if (jobIsDone) {
+                    clearInterval(intervalId);
+                    intervalId = null;
+                }
+            })
+    }
+
+    function sendJobCreationRequest() {
+        if (points.length == 0) return;
+
+        jobIsDone = false;
+
+        const payload = {
+            "points": points
+        }
+
+        fetch(endpoint, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(payload)
+        })
+            .then(response => {
+                if (!response.ok) console.log("Bad request");
+                else {
+                    return response.json();
+                }
+            })
+            .then(data => {
+                jobId = data["job_id"];
+                setInterval(sendJobInfoRequest, 30000);
+            })
+    }
+
+    generateBtn.addEventListener("click", sendJobCreationRequest);
 })
 
