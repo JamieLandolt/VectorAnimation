@@ -96,6 +96,9 @@ class VectorData:
     def get_c_vals(self):
         return self.c_vals
 
+    def get_worst_case_length(self):
+        return sum([np.sqrt(row[1][0]**2 + row[1][1]**2) for row in self.c_vals])
+
 
 # Jasper testing
 data_heart = np.array([
@@ -103,8 +106,11 @@ data_heart = np.array([
      13 * np.cos(t) - 5 * np.cos(2*t) - 2 * np.cos(3*t) - np.cos(4*t))
     for t in np.linspace(0, 2*np.pi, 100)
 ])
+r = 1
+data_circle = np.array([(r*np.cos(theta), r*np.sin(theta))
+                       for theta in np.linspace(0, 2*np.pi, 100)])
 
-vectorData = VectorData(data_heart)
+vectorData = VectorData(data_circle)
 # vector_info = vectorData.get_c_vals()
 # print(vector_info)
 
@@ -112,7 +118,7 @@ vectorData = VectorData(data_heart)
 class VectorTest(VectorScene):
     # TODO: don't do ql for low quality when running, probs do qh or qk
     def construct(self):
-        self.camera.set
+
         num_vecs = 20
         # radii = np.array([i/(2*num_vecs) for i in range(num_vecs)])
         # freqs = np.array([i for i in range(int(-num_vecs/2), int(num_vecs/2))])
@@ -123,7 +129,9 @@ class VectorTest(VectorScene):
 
         vector_info = vectorData.get_c_vals()
 
-        self.camera.set
+        self.camera.set_frame_width(2.4171102834757944e-11)
+        self.camera.set_frame_height(2.4171102834757944e-11)
+
         self.add_axes(animate=True, run_time=0.5)
         self.add_plane(animate=True, run_time=0.5)
         self.wait()

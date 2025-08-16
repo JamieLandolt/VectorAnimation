@@ -92,6 +92,9 @@ class VectorData:
     def get_c_vals(self):
         return self.c_vals
 
+    def get_worst_case_length(self):
+        return sum([np.sqrt(row[1][0]**2 + row[1][1]**2) for row in self.c_vals])
+
 
 if __name__ == "__main__":
     data_heart = np.array([
@@ -103,3 +106,4 @@ if __name__ == "__main__":
     vectorData = VectorData(data_heart)
     vector_info = vectorData.get_c_vals()
     print(vector_info)
+    print(vectorData.get_worst_case_length())
