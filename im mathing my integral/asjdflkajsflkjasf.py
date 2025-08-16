@@ -19,13 +19,18 @@ def get_c_j(x_y_vals, j: int) -> float:
 
     # first get the average of x and y independently
 
-    def fx(t): return x_y_vals[t][0]*np.cos(-2 *
-                                            np.pi*j*t) - x_y_vals[t][1]*np.sin(-2*np.pi*j*t)
-    def fy(t): return x_y_vals[t][1]*np.cos(-2 *
-                                            np.pi*j*t) + x_y_vals[t][0]*np.sin(-2*np.pi*j*t)
+    N = len(x_y_vals)
 
-    fx_vals = np.array([fx(t) for t in range(len(x_y_vals))])
-    fy_vals = np.array([fy(t) for t in range(len(x_y_vals))])
+    def fx(t):
+        angle = -2 * np.pi * j * t / N
+        return x_y_vals[t][0] * np.cos(angle) - x_y_vals[t][1] * np.sin(angle)
+
+    def fy(t):
+        angle = -2 * np.pi * j * t / N
+        return x_y_vals[t][1] * np.cos(angle) + x_y_vals[t][0] * np.sin(angle)
+
+    fx_vals = [fx(t) for t in range(N)]
+    fy_vals = [fy(t) for t in range(N)]
 
     return (get_average(fx_vals), get_average(fy_vals))
 
@@ -102,8 +107,13 @@ if __name__ == "__main__":
          13 * np.cos(t) - 5 * np.cos(2*t) - 2 * np.cos(3*t) - np.cos(4*t))
         for t in np.linspace(0, 2*np.pi, 100)
     ])
+    r = 1
+    data_circle = np.array([(r*np.cos(theta), r*np.sin(theta))
+                           for theta in np.linspace(0, 2*np.pi, 100)])
 
-    vectorData = VectorData(data_heart)
+    vectorData = VectorData(data_circle)
+    vectorData.sort_by_speed()
     vector_info = vectorData.get_c_vals()
+
     print(vector_info)
     print(vectorData.get_worst_case_length())
