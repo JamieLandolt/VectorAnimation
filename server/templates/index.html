@@ -23,4 +23,26 @@
         </div>
     </div>
 </section>
+<!-- BUTTONS -->
+<div class="controls">
+    <h3>Animation Parameters</h3>
+    <div class="param-grid">
+    <div>
+        <label for="numVectors">Number of Vectors:</label>
+        <input type="number" id="numVectors" value="41" min="1" step="2">
+    </div>
+
+    <div>
+        <label for="sortStyle">Sort Style:</label>
+        <select id="sortStyle">
+            <option value="speed" selected>Speed</option>
+            <option value="size">Size</option>
+        </select>
+    </div>
+    <div>
+        <label for="sortAscending">Sort Ascending:</label>
+        <input type="checkbox" id="sortAscending" checked>
+    </div>
+</div>
+</div>
 {% endblock %}
