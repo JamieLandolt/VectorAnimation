@@ -2,6 +2,7 @@ from flask import Flask, render_template, request
 from flask_restx import reqparse, Api, Resource
 import uuid
 import numpy as np
+from run_animate_from_file import run_animation
 
 
 app = Flask(__name__)
@@ -63,6 +64,7 @@ class JobApi(Resource):
             "job_id": new_job_id
         }
 
+        run_animation(new_job_id);
         return response, 201
 
 
