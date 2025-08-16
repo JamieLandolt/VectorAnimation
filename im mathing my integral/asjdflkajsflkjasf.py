@@ -1,5 +1,5 @@
 from typing import List
-import matplotlib.pyplot as plt
+# import matplotlib.pyplot as plt
 import numpy as np
 
 
@@ -36,16 +36,16 @@ class VectorData:
     def __init__(self, data: List[List[float]]):
         """Data is of the form of a list of x and y tuples/lists"""
         self.data = data
-        self.c_vals = self.update_internal_c_vals()
+        self.update_internal_c_vals()
 
     def update_internal_c_vals(self, min_j=-20, max_j=20):
         self.c_vals = [(j, get_c_j(self.data, j))
                        for j in range(min_j, max_j+1)]
 
-    def plot_data(self):
-        plt.scatter(x=self.data[:, 0], y=self.data[:, 1])
-        plt.axis('equal')
-        plt.show()
+    # def plot_data(self):
+    #     plt.scatter(x=self.data[:, 0], y=self.data[:, 1])
+    #     plt.axis('equal')
+    #     plt.show()
 
     def sort_by_speed(self, asc=True):
         """Assumes continuity between max and min j
@@ -92,3 +92,15 @@ class VectorData:
 
     def get_c_vals(self):
         return self.c_vals
+
+
+if __name__ == "__main__":
+    data_heart = np.array([
+        (16 * np.sin(t)**3,
+         13 * np.cos(t) - 5 * np.cos(2*t) - 2 * np.cos(3*t) - np.cos(4*t))
+        for t in np.linspace(0, 2*np.pi, 100)
+    ])
+
+    vectorData = VectorData(data_heart)
+    vector_info = vectorData.get_c_vals()
+    print(vector_info)
