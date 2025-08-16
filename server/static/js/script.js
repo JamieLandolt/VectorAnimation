@@ -61,6 +61,11 @@ window.addEventListener("load", () => {
     const endpoint = "http://127.0.0.1:5000/api/job";
 
     const generateBtn = document.querySelector("#generate-btn");
+    const canvasSection = document.querySelector("#canvas-section");
+    const videoSection = document.querySelector("#video-section");
+    const videoSectionContainer = document.querySelector("#video-section .container");
+
+    const videoDirectory = "/media/videos/animate_from_file/1440p60/";
 
     function sendJobInfoRequest() {
         if (jobId == null) return;
@@ -83,9 +88,20 @@ window.addEventListener("load", () => {
             })
             .then(data => {
                 jobIsDone = data["is_done"];
+                console.log(jobIsDone);
                 if (jobIsDone) {
                     clearInterval(intervalId);
                     intervalId = null;
+                    canvasSection.classList.toggle("hide");
+                    videoSection.classList.toggle("hide");
+
+                    jobId = data["job_id"];
+
+                    const videoElement = document.createElement('video');
+                    const videoEndpoint = `http://127.0.0.1:5000/api/job/video?${queryString}`;
+                    videoElement.src = videoEndpoint;
+                    videoElement.controls = true;
+                    videoSectionContainer.appendChild(videoElement);
                 }
             })
     }
