@@ -32,7 +32,6 @@ def get_c_j(x_y_vals, j: int) -> float:
 
 
 class VectorData:
-
     def __init__(self, data: List[List[float]]):
         """Data is of the form of a list of x and y tuples/lists"""
         self.data = data
