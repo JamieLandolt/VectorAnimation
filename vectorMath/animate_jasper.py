@@ -112,7 +112,6 @@ vectorData = VectorData(data_heart)
 class VectorTest(VectorScene):
     # TODO: don't do ql for low quality when running, probs do qh or qk
     def construct(self):
-        self.camera.set
         num_vecs = 20
         # radii = np.array([i/(2*num_vecs) for i in range(num_vecs)])
         # freqs = np.array([i for i in range(int(-num_vecs/2), int(num_vecs/2))])
@@ -123,7 +122,6 @@ class VectorTest(VectorScene):
 
         vector_info = vectorData.get_c_vals()
 
-        self.camera.set
         self.add_axes(animate=True, run_time=0.5)
         self.add_plane(animate=True, run_time=0.5)
         self.wait()
