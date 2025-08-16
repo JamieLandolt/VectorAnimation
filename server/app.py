@@ -2,6 +2,7 @@ from flask import Flask, render_template, request
 from flask_restx import reqparse, Api, Resource
 import uuid
 
+
 app = Flask(__name__)
 api = Api(app, doc='/docs', prefix='/api')
 
