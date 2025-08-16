@@ -1,0 +1,6 @@
+media/*
+
+server/points/*
+server/media/*
+media/*
+server/__pycache__/*

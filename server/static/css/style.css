@@ -1,0 +1,119 @@
+@import url('https://fonts.googleapis.com/css2?family=Audiowide&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
+
+/* CONSTANT VARIABLES ****************************************************************************/    
+:root {
+    /* Colors */
+    --bg-primary: #35374B;
+    --bg-secondary: #344955;
+    --primary: #78A083;
+    --secondary: #50727B;
+    --light: #fff;
+    --pastel-red: #ff6960;
+    --pastel-green: #77de77;
+
+    /* Fonts */
+    --font-display: "Audiowide", sans-serif;
+    --font-body: "Poppins", sans-serif;
+
+    /* Font Sizing */
+    --h1-font-size: 4rem;
+    --h2-font-size: 2rem;
+    --p-font-size: 1.5rem;
+}
+
+/* GLOBAL STYLING AND UTILITIES ******************************************************************/
+
+* {
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    background-color: var(--bg-primary);
+    min-height: 100vh;
+    width: 100vw;
+}
+
+h1 {
+    font-size: var(--h1-font-size);
+    font-family: var(--font-display);
+    color: var(--primary);
+}
+
+h2 {
+    font-size: var(--h2-font-size);
+    font-family: var(--font-display);
+}
+
+p {
+    font-size: var(--p-font-size);
+    font-family: var(--font-body);
+}
+
+button {
+    border-radius: 15px;
+    font-family: var(--font-body);
+    box-shadow: 5px 5px rgba(0,0,0,0.1);
+    font-size: var(--p-font-size);
+}
+
+.container {
+    width: 64rem;
+    margin: 0 auto;
+}
+
+/* HEADER ****************************************************************************************/
+header {
+    width: 100%;
+}
+
+header .container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: start;
+    color: var(--light);
+    padding: 1rem;
+}
+
+header .container:first-child {
+    margin-bottom: 1rem;
+}
+
+header .container:last-child {
+    font-family: var(--font-body);
+    margin-top: 0;
+}
+
+/* CANVAS ****************************************************************************************/
+#canvas-section .container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+#canvas-section .container #canvas {
+    background-color: var(--light);
+    border: 0.5rem var(--bg-secondary) solid;
+    box-shadow: 10px 10px rgba(0,0,0, 0.1);
+}
+
+#canvas-section .container .buttons {
+    margin-top: 1rem;
+    display: flex;
+    justify-content: center;
+    align-items: center; 
+}
+
+#canvas-section .container .buttons #clear-btn {
+    background-color: var(--pastel-red);
+    padding: 1rem 3rem; 
+    margin-right: 1rem;
+}
+
+#canvas-section .container .buttons #generate-btn {
+    background-color: var(--pastel-green);
+    padding: 1rem 3rem;
+}
+
