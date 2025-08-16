@@ -9,20 +9,24 @@ app = Flask(__name__)
 api = Api(app, doc='/docs', prefix='/api')
 
 # WEBSITE ########################################################################################
+
+
 @app.route('/')
 def index():
     return render_template("index.html")
 
 # SERVER API #####################################################################################
+
+
 class Job():
     def __init__(self, points):
         self.id = str(uuid.uuid4())
         self.points = points
         self.is_done = False
-    
+
     def get_id(self):
         return self.id
-    
+
     def get_points(self):
         return self.points
 
@@ -32,39 +36,54 @@ class Job():
             "is_done": self.is_done
         }
 
+
 job_dict = {}
 
+DEFAULT_RENDER_PARAMS = {
+    "vectorJMin": -20,
+    "vectorJMax": 20,
+    "sortStyle": "size",
+    "sortAscending": True,
+}
+
 job_creation_args = reqparse.RequestParser()
-job_creation_args.add_argument('points', type=list, location='json', required=True);
+job_creation_args.add_argument(
+    'points', type=list, location='json', required=True)
+job_creation_args.add_argument(
+    'render_params', type=dict, location='json', required=False, default=DEFAULT_RENDER_PARAMS
+)
+
 
 @api.route('/job')
 class JobApi(Resource):
     def get(self):
         job_id = request.args.get('job_id')
 
-        job = job_dict[job_id] # TODO: John use a job_dict.get(job_id, default_value) here so it stops erroring
+        # TODO: John use a job_dict.get(job_id, default_value) here so it stops erroring
+        job = job_dict[job_id]
         return job.get_job_info(), 200
 
     @api.expect(job_creation_args)
     def post(self):
         args = job_creation_args.parse_args()
         points = args['points']
+        render_params = args['render_params']
 
-        new_job = Job(points);
-        new_job_id = new_job.get_id();
+        new_job = Job(points)
+        new_job_id = new_job.get_id()
         job_dict[new_job_id] = new_job
 
         points_ndarray = np.array(
             [[point["x"], point["y"]] for point in points]
         )
 
-        np.save("points/" + new_job_id + ".npy", points_ndarray);
+        np.save("points/" + new_job_id + ".npy", points_ndarray)
 
         response = {
             "job_id": new_job_id
         }
 
-        run_animation(new_job_id);
+        run_animation(new_job_id, render_params)
         return response, 201
 
 

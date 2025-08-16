@@ -94,10 +94,32 @@ window.addEventListener("load", () => {
         if (points.length == 0) return;
 
         jobIsDone = false;
+    const numVectors = parseInt(document.querySelector("#numVectors").value, 10);
+    const sortStyle = document.querySelector("#sortStyle").value;
+    const sortAscending = document.querySelector("#sortAscending").checked; // .checked returns a boolean
 
-        const payload = {
-            "points": points
+    const n = Math.floor(numVectors / 2);
+    let vectorJMin, vectorJMax;
+
+        if (numVectors % 2 === 1) {
+        // If odd (e.g., 41), create a symmetric range like -20 to 20
+        vectorJMin = -n;
+        vectorJMax = n;
+    } else {
+        // If even (e.g., 40), create a nearly symmetric range like -20 to 19
+        vectorJMin = -n;
+        vectorJMax = n - 1;
+    }
+
+         const payload = {
+        "points": points,
+        "render_params": {
+            "vectorJMin": vectorJMin,
+            "vectorJMax": vectorJMax,
+            "sortStyle": sortStyle,
+            "sortAscending": sortAscending
         }
+    }
 
         fetch(endpoint, {
             method: 'POST',
