@@ -93,3 +93,194 @@ I hope it’s in the same scope as you.
 ---
 
 I can also write you a **shorter, punchier version** of this that would fit on a mug or T-shirt if you want something more compact and meme-like.
+
+16 aug 11:36am
+
+manim tracing tail
+
+You can create tracing tails in Manim to show the path that objects follow. Here are several approaches:
+Method 1: Using TracedPath (Most Common)
+pythonfrom manimlib.imports import *
+import numpy as np
+
+class VectorTracing(VectorScene):
+    def construct(self):
+        self.add_axes(animate=True)
+        self.add_plane(animate=True)
+        self.wait()
+
+        myVec = Vector([2, 1])
+        self.add_vector(myVec, animate=True)
+
+        # Create a traced path for the vector tip
+        traced_path = TracedPath(myVec.get_end)
+        self.add(traced_path)
+
+        # Move the vector and watch the tail trace
+        def move_vector(mob, dt):
+            t = self.time
+            new_tip = [3 * np.cos(t), 2 * np.sin(t)]
+            mob.put_start_and_end_on(ORIGIN, new_tip)
+
+        myVec.add_updater(move_vector)
+        self.wait(8)
+Method 2: Tracing with a dot at the tip
+pythonfrom manimlib.imports import *
+import numpy as np
+
+class VectorWithDotTracing(VectorScene):
+    def construct(self):
+        self.add_axes(animate=True)
+        self.add_plane(animate=True)
+        self.wait()
+
+        myVec = Vector([2, 1])
+        self.add_vector(myVec, animate=True)
+
+        # Add a dot at the tip
+        tip_dot = Dot(radius=0.05, color=RED)
+        tip_dot.move_to(myVec.get_end())
+        self.add(tip_dot)
+
+        # Trace the dot's path
+        traced_path = TracedPath(tip_dot.get_center, stroke_color=YELLOW, stroke_width=3)
+        self.add(traced_path)
+
+        # Update both vector and dot
+        def move_vector(mob, dt):
+            t = self.time
+            new_tip = [3 * np.cos(t), 2 * np.sin(t)]
+            mob.put_start_and_end_on(ORIGIN, new_tip)
+            tip_dot.move_to(new_tip)
+
+        myVec.add_updater(move_vector)
+        self.wait(10)
+Method 3: Multiple vectors with different colored tails
+pythonfrom manimlib.imports import *
+import numpy as np
+
+class MultiVectorTracing(VectorScene):
+    def construct(self):
+        self.add_axes(animate=True)
+        self.add_plane(animate=True)
+        self.wait()
+
+        # Create multiple vectors
+        colors = [RED, BLUE, GREEN, YELLOW]
+        vectors = []
+        traced_paths = []
+
+        for i, color in enumerate(colors):
+            vec = Vector([1 + i*0.5, 1], color=color)
+            vectors.append(vec)
+            self.add_vector(vec, animate=False)
+
+            # Create traced path for each vector
+            traced_path = TracedPath(
+                vec.get_end,
+                stroke_color=color,
+                stroke_width=2
+            )
+            traced_paths.append(traced_path)
+            self.add(traced_path)
+
+        # Move each vector differently
+        def move_vectors(dt):
+            t = self.time
+            for i, vec in enumerate(vectors):
+                radius = 2 + i * 0.5
+                freq = 1 + i * 0.3
+                new_tip = [
+                    radius * np.cos(freq * t + i * np.pi/2),
+                    radius * np.sin(freq * t + i * np.pi/2)
+                ]
+                vec.put_start_and_end_on(ORIGIN, new_tip)
+
+        self.add_updater(move_vectors)
+        self.wait(12)
+Method 4: Fading tail effect
+pythonfrom manimlib.imports import *
+import numpy as np
+
+class FadingTailVector(VectorScene):
+    def construct(self):
+        self.add_axes(animate=True)
+        self.add_plane(animate=True)
+        self.wait()
+
+        myVec = Vector([2, 1])
+        self.add_vector(myVec, animate=True)
+
+        # Create traced path with fading
+        traced_path = TracedPath(
+            myVec.get_end,
+            dissipating_time=3,  # Tail fades after 3 seconds
+            stroke_color=YELLOW,
+            stroke_width=4
+        )
+        self.add(traced_path)
+
+        # Move in a figure-8 pattern
+        def move_vector(mob, dt):
+            t = self.time
+            new_tip = [
+                3 * np.sin(t),
+                2 * np.sin(2 * t)
+            ]
+            mob.put_start_and_end_on(ORIGIN, new_tip)
+
+        myVec.add_updater(move_vector)
+        self.wait(15)
+Method 5: Custom tail with line segments
+pythonfrom manimlib.imports import *
+import numpy as np
+
+class CustomTailVector(VectorScene):
+    def construct(self):
+        self.add_axes(animate=True)
+        self.add_plane(animate=True)
+        self.wait()
+
+        myVec = Vector([2, 1])
+        self.add_vector(myVec, animate=True)
+
+        # Store path points manually
+        path_points = []
+        tail_lines = VGroup()
+        self.add(tail_lines)
+
+        def update_tail(mob, dt):
+            current_tip = myVec.get_end()[:2]  # Get x, y only
+            path_points.append(current_tip)
+
+            # Keep only last 50 points
+            if len(path_points) > 50:
+                path_points.pop(0)
+
+            # Recreate tail lines
+            tail_lines.clear_updaters()
+            tail_lines.remove(*tail_lines.submobjects)
+
+            if len(path_points) > 1:
+                for i in range(len(path_points) - 1):
+                    alpha = i / len(path_points)  # Fade older segments
+                    line = Line(
+                        [*path_points[i], 0],
+                        [*path_points[i+1], 0],
+                        stroke_width=3 * alpha,
+                        stroke_opacity=alpha,
+                        color=YELLOW
+                    )
+                    tail_lines.add(line)
+
+        self.add_updater(update_tail)
+
+        # Move the vector
+        def move_vector(mob, dt):
+            t = self.time
+            new_tip = [3 * np.cos(t), 2 * np.sin(t)]
+            mob.put_start_and_end_on(ORIGIN, new_tip)
+
+        myVec.add_updater(move_vector)
+        self.wait(10)
+Most useful: Method 1 (TracedPath) is the simplest and most efficient way to create tracing tails in Manim!
