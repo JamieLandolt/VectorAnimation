@@ -42,7 +42,7 @@ class JobApi(Resource):
     def get(self):
         job_id = request.args.get('job_id')
 
-        job = job_dict[job_id]
+        job = job_dict[job_id] # TODO: John use a job_dict.get(job_id, default_value) here so it stops erroring
         return job.get_job_info(), 200
 
     @api.expect(job_creation_args)

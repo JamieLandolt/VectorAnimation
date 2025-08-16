@@ -4,6 +4,8 @@ import numpy as np
 from typing import List
 import json
 
+# TODO: Zoom, fix circles, Button on website for selecting sort, Button for selecting quality (numVectors)
+# TODO: Adjust length of video based on number/time of timestamps, Add high quality option on website
 
 def get_average(vals: List[float]) -> float:
     if len(vals) < 3:
@@ -116,7 +118,7 @@ class VectorRender(VectorScene):
     }
 
     def construct(self):
-        self.low_quality = False
+        self.high_quality = True
         self.enable_circles = False
 
         self.camera.frame_rate = 30
@@ -154,7 +156,8 @@ class VectorRender(VectorScene):
 
         vectorData = VectorData(data)
         vectorData.update_internal_c_vals(
-            params['vectorJMin'], params['vectorJMax'])
+            params['vectorJMin'] if not self.high_quality else -100,
+            params['vectorJMax'] if not self.high_quality else 100)
 
         if params['sortStyle'] == 'size':
             vectorData.sort_by_mag(byLargest=params['sortAscending'])
