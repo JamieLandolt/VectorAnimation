@@ -168,16 +168,22 @@ class VectorRender(VectorScene):
         # Create vectors starting from origin pointing to their c_j at t=0
         circle_colours = color_gradient([RED, ORANGE, YELLOW_D], self.num_vecs)
 
+        cumulative_vector_offsets = np.zeros(3)
         biggest_magnitude = max(
             vector_info, key=lambda x: x[1][0] ** 2 + x[1][1] ** 2)
         biggest_magnitude = np.sqrt(
             biggest_magnitude[1][0] ** 2 + biggest_magnitude[1][1] ** 2)
 
         vecs = []
-        for freq, (x, y) in vector_info:
+        for i, (freq, (x, y)) in enumerate(vector_info):
             vec_magnitude = np.sqrt((x ** 2) + (y ** 2))
             vec = Vector([x, y, 0], stroke_width=6 * vec_magnitude /
                                                  biggest_magnitude, tip_length=vec_magnitude / biggest_magnitude * 1)
+
+            # Shift each vector for the initial drawing
+            cumulative_vector_offsets += np.array(
+                [vector_info[i - 1][1][0], vector_info[i - 1][1][1], 0]) if i != 0 else cumulative_vector_offsets
+            vec.shift(cumulative_vector_offsets)
 
             # Set vector attributes
             vec.set_color(GREEN_C)
@@ -274,7 +280,6 @@ class VectorRender(VectorScene):
             y_step=1,
         )
         self.play(ShowCreation(plane))
-
 
 
 class FadingTail(VGroup):
