@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request
 from flask_restx import reqparse, Api, Resource
 import uuid
+import numpy as np
 
 
 app = Flask(__name__)
@@ -51,6 +52,12 @@ class JobApi(Resource):
         new_job = Job(points);
         new_job_id = new_job.get_id();
         job_dict[new_job_id] = new_job
+
+        points_ndarray = np.array(
+            [[point["x"], point["y"]] for point in points]
+        )
+
+        np.save("points/" + new_job_id + ".npy", points_ndarray);
 
         response = {
             "job_id": new_job_id
