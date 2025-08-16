@@ -1,0 +1,1 @@
+{"vectorJMin": -20, "vectorJMax": 20, "sortStyle": "size", "sortAscending": true}

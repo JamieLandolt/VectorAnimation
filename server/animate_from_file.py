@@ -2,7 +2,7 @@ from manim import *
 from manimlib.imports import *
 import numpy as np
 from typing import List
-import random
+import json
 
 
 def get_average(vals: List[float]) -> float:
@@ -132,10 +132,21 @@ class VectorRender(VectorScene):
 
         data = np.load('data.npy')
 
+        json_text = ""
+        with open("params.txt", "r") as file:
+            json_text = file.read()
+
+        params = json.loads(json_text)
+
         vectorData = VectorData(data)
 
-        vectorData.update_internal_c_vals(-20, 20)
-        vectorData.sort_by_speed()
+        vectorData.update_internal_c_vals(
+            params['vectorJMin'], params['vectorJMax'])
+        if params['sortStyle'] == 'size':
+            vectorData.sort_by_mag(byLargest=params['sortAscending'])
+        else:
+            vectorData.sort_by_speed(asc=params['sortAscending'])
+
         vector_info = vectorData.get_c_vals()
         self.num_vecs = vectorData.get_num_vectors()
 
