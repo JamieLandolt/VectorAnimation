@@ -2,7 +2,7 @@ from manim import *
 from manimlib.imports import *
 import numpy as np
 from typing import List
-import random
+import json
 
 
 def get_average(vals: List[float]) -> float:
@@ -121,12 +121,32 @@ class VectorRender(VectorScene):
         self.enable_circles = False
 
         self.camera.frame_rate = 30
+        self.camera.background_color = RED_A
+
+        # # Jasper testing (Testy Heart Data)
+        # data = np.array([
+        #     (16 * np.sin(t) ** 3,
+        #      13 * np.cos(t) - 5 * np.cos(2 * t) - 2 * np.cos(3 * t) - np.cos(4 * t))
+        #     for t in np.linspace(0, 2 * np.pi, 100)
+        # ])
 
         data = np.load('data.npy')
+
+        json_text = ""
+        with open("params.txt", "r") as file:
+            json_text = file.read()
+
+        params = json.loads(json_text)
+
         vectorData = VectorData(data)
 
-        vectorData.update_internal_c_vals(-20, 20)
-        vectorData.sort_by_speed()
+        vectorData.update_internal_c_vals(
+            params['vectorJMin'], params['vectorJMax'])
+        if params['sortStyle'] == 'size':
+            vectorData.sort_by_mag(byLargest=params['sortAscending'])
+        else:
+            vectorData.sort_by_speed(asc=params['sortAscending'])
+
         vector_info = vectorData.get_c_vals()
         self.num_vecs = vectorData.get_num_vectors()
 
@@ -192,20 +212,15 @@ class VectorRender(VectorScene):
 
         # Create vectors starting from origin pointing to their c_j at t=0
         vecs = []
-        cumulative_vector_offsets = np.zeros(3)
-
         circle_colours = color_gradient([RED, ORANGE, YELLOW_D], self.num_vecs)
-
-        biggest_magnitude = max(vector_info, key=lambda x: x[1][0] ** 2 + x[1][1] ** 2)
-        biggest_magnitude = np.sqrt(biggest_magnitude[1][0] ** 2 + biggest_magnitude[1][1] ** 2)
-
-        for i, (freq, (x, y)) in enumerate(vector_info):
+        biggest_magnitude = max(
+            vector_info, key=lambda x: x[1][0] ** 2 + x[1][1] ** 2)
+        biggest_magnitude = np.sqrt(
+            biggest_magnitude[1][0] ** 2 + biggest_magnitude[1][1] ** 2)
+        for freq, (x, y) in vector_info:
             vec_magnitude = np.sqrt((x ** 2) + (y ** 2))
-            vec = Vector([x, y, 0], stroke_width=6 * vec_magnitude / biggest_magnitude,
-                         tip_length=vec_magnitude / biggest_magnitude * 1)
-            cumulative_vector_offsets += np.array(
-                [vector_info[i - 1][1][0], vector_info[i - 1][1][1], 0]) if i != 0 else cumulative_vector_offsets
-            vec.shift(cumulative_vector_offsets)
+            vec = Vector([x, y, 0], stroke_width=6 * vec_magnitude /
+                         biggest_magnitude, tip_length=vec_magnitude / biggest_magnitude * 1)
 
             # Set vector attributes
             vec.set_color(GREEN_C)
