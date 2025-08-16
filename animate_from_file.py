@@ -105,7 +105,7 @@ class VectorData:
         return len(self.c_vals)
 
 
-class VectorTest(VectorScene):
+class VectorRender(VectorScene):
     CONFIG = {
         "axes_config": {
             "stroke_opacity": 0.4,
@@ -314,4 +314,4 @@ class FadingTail(VGroup):
 
 
 if __name__ == "__main__":
-    VectorTest().construct()
+    VectorRender().construct()
