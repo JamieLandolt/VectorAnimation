@@ -132,3 +132,71 @@ header .container:last-child {
 #video-section .container video {
     width: 100%;
 }
+
+/* CONTROLS SECTION ******************************************************************************/
+.controls {
+    width: 64rem;
+    margin: 2rem auto 0 auto; /* Added top margin */
+    padding: 2rem;
+    background-color: var(--bg-secondary);
+    border-radius: 15px;
+    box-shadow: 10px 10px rgba(0,0,0, 0.1);
+    color: var(--light);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.controls h3 {
+    font-size: var(--h2-font-size);
+    font-family: var(--font-display);
+    color: var(--primary);
+    margin-bottom: 1.5rem;
+    text-align: center;
+}
+
+.controls .param-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr; /* Creates two columns */
+    gap: 1.5rem 3rem; /* Row and column gap */
+    width: 100%;
+    max-width: 800px;
+}
+
+.controls .param-grid > div {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-family: var(--font-body);
+    font-size: 1.2rem;
+}
+
+.controls label {
+    margin-right: 1rem;
+}
+
+.controls input[type="number"],
+.controls select {
+    background-color: var(--bg-primary);
+    color: var(--light);
+    border: 2px solid var(--secondary);
+    border-radius: 8px;
+    padding: 0.5rem;
+    font-family: var(--font-body);
+    font-size: 1rem;
+    width: 100px; /* Give a fixed width */
+    text-align: center;
+}
+
+.controls input[type="checkbox"] {
+    width: 1.5rem;
+    height: 1.5rem;
+    accent-color: var(--primary); /* Styles the checkmark color */
+}
+
+/* To make the grid responsive on smaller screens */
+@media (max-width: 768px) {
+    .controls .param-grid {
+        grid-template-columns: 1fr; /* Stack to a single column */
+    }
+}

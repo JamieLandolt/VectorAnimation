@@ -2,8 +2,10 @@ from manim import *
 from manimlib.imports import *
 import numpy as np
 from typing import List
-import random
+import json
 
+# TODO: Zoom, fix circles, Button on website for selecting sort, Button for selecting quality (numVectors)
+# TODO: Adjust length of video based on number/time of timestamps, Add high quality option on website
 
 def get_average(vals: List[float]) -> float:
     if len(vals) < 3:
@@ -115,64 +117,100 @@ class VectorRender(VectorScene):
         },
     }
 
-    # TODO: don't do ql for low quality when running, probs do qh or qk
     def construct(self):
-        self.low_quality = False
+        self.high_quality = True
         self.enable_circles = False
 
         self.camera.frame_rate = 30
         self.camera.background_color = RED_A
 
-        # # Jasper testing (Testy Heart Data)
-        # data = np.array([
-        #     (16 * np.sin(t) ** 3,
-        #      13 * np.cos(t) - 5 * np.cos(2 * t) - 2 * np.cos(3 * t) - np.cos(4 * t))
-        #     for t in np.linspace(0, 2 * np.pi, 100)
-        # ])
-
-        data = np.load('data.npy')
-
-        vectorData = VectorData(data)
+        vectorData, vector_info = self.get_vector_info()
         self.num_vecs = vectorData.get_num_vectors()
 
-        vectorData.update_internal_c_vals(-10, 10)
-        vectorData.sort_by_speed()
-        vector_info = vectorData.get_c_vals()
+        aspect_ratio = 9/16
+        self.set_fov(vector_info, aspect_ratio)
+        self.draw_plane_axes(aspect_ratio)
 
+        vecs = self.create_vectors(vector_info)
+        self.animate_vectors(vector_info, vecs)
+
+    def set_fov(self, vector_info, aspect_ratio):
         # Determine how big frame is
         self.max_vector_height = 0
+
+        # Calc max possible vector distance from origin
         for _, (i, j) in vector_info:
             self.max_vector_height += np.sqrt(i ** 2 + j ** 2)
-        self.max_vector_height *= 4/5
+        self.max_vector_height *= 4/5 # This is a random number lol seems to work
 
         self.camera.set_frame_width(2*self.max_vector_height)
-        self.camera.set_frame_height(2*self.max_vector_height)
+        self.camera.set_frame_height(2*self.max_vector_height*aspect_ratio)
 
-        axes = Axes(
-            x_min=-self.max_vector_height,
-            x_max=self.max_vector_height,
-            x_step=1,
-            y_min=-self.max_vector_height,
-            y_max=self.max_vector_height,
-            y_step=1,
+    def get_vector_info(self):
+        data = np.load('data.npy')
 
-        )
-        self.play(ShowCreation(axes))
-        plane = NumberPlane(
-            background_line_style={  # Faint sub-grid
-                "stroke_color": WHITE,
-                "stroke_width": 0.5,
-                "stroke_opacity": 0.9
-            },
-            x_min=-self.max_vector_height,
-            x_max=self.max_vector_height,
-            x_step=1,
-            y_min=-self.max_vector_height,
-            y_max=self.max_vector_height,
-            y_step=1,
-        )
-        self.play(ShowCreation(plane))
-        self.wait()
+        with open("params.txt", "r") as file:
+            json_text = file.read()
+
+        params = json.loads(json_text)
+
+        vectorData = VectorData(data)
+        vectorData.update_internal_c_vals(
+            params['vectorJMin'] if not self.high_quality else -100,
+            params['vectorJMax'] if not self.high_quality else 100)
+
+        if params['sortStyle'] == 'size':
+            vectorData.sort_by_mag(byLargest=params['sortAscending'])
+        else:
+            vectorData.sort_by_speed(asc=params['sortAscending'])
+
+        vector_info = vectorData.get_c_vals()
+        return vectorData, vector_info
+
+    def create_vectors(self, vector_info):
+        # Create vectors starting from origin pointing to their c_j at t=0
+        circle_colours = color_gradient([RED, ORANGE, YELLOW_D], self.num_vecs)
+
+        cumulative_vector_offsets = np.zeros(3)
+        biggest_magnitude = max(
+            vector_info, key=lambda x: x[1][0] ** 2 + x[1][1] ** 2)
+        biggest_magnitude = np.sqrt(
+            biggest_magnitude[1][0] ** 2 + biggest_magnitude[1][1] ** 2)
+
+        vecs = []
+        for i, (freq, (x, y)) in enumerate(vector_info):
+            vec_magnitude = np.sqrt((x ** 2) + (y ** 2))
+            vec = Vector([x, y, 0], stroke_width=6 * vec_magnitude /
+                                                 biggest_magnitude, tip_length=vec_magnitude / biggest_magnitude * 1)
+
+            # Shift each vector for the initial drawing
+            cumulative_vector_offsets += np.array(
+                [vector_info[i - 1][1][0], vector_info[i - 1][1][1], 0]) if i != 0 else cumulative_vector_offsets
+            vec.shift(cumulative_vector_offsets)
+
+            # Set vector attributes
+            vec.set_color(GREEN_C)
+            vec.set_fill(GREEN)
+            vec.set_opacity(0.6)
+
+            vecs.append(vec)
+
+            if self.enable_circles:
+                # Circumscribe vectors
+                # circle = Circle(radius=get_norm(vec.get_end() - vec.get_start()), color=circle_colours[i], stroke_width=0.8, stroke_opacity=0.8)
+                # circle.move_to(vec.get_start())
+                # circle.add_updater(update_circle_position(vec))
+                # self.add(circle)
+                pass
+
+        # Animate placing vectors
+        self.play(*[GrowArrow(vec) for vec in vecs], run_time=0.5)
+
+        return vecs
+
+    def animate_vectors(self, vector_info, vecs):
+        def get_freqs(x):
+            return x[0]
 
         def rotate_constantly(freq):
             def rotate(mob, dt):
@@ -197,37 +235,6 @@ class VectorRender(VectorScene):
                 mob.move_to(vec.get_start())
             return move_circle
 
-        # Create vectors starting from origin pointing to their c_j at t=0
-        vecs = []
-        circle_colours = color_gradient([RED, ORANGE, YELLOW_D], self.num_vecs)
-        biggest_magnitude = max(
-            vector_info, key=lambda x: x[1][0] ** 2 + x[1][1] ** 2)
-        biggest_magnitude = np.sqrt(
-            biggest_magnitude[1][0] ** 2 + biggest_magnitude[1][1] ** 2)
-        for freq, (x, y) in vector_info:
-            vec_magnitude = np.sqrt((x ** 2) + (y ** 2))
-            vec = Vector([x, y, 0], stroke_width=6 * vec_magnitude /
-                         biggest_magnitude, tip_length=vec_magnitude / biggest_magnitude * 1)
-
-            # Set vector attributes
-            vec.set_color(GREEN_C)
-            vec.set_fill(GREEN)
-            vec.set_opacity(0.6)
-
-            vecs.append(vec)
-
-            if self.enable_circles:
-                # Circumscribe vectors
-                # circle = Circle(radius=get_norm(vec.get_end() - vec.get_start()), color=circle_colours[i], stroke_width=0.8, stroke_opacity=0.8)
-                # circle.move_to(vec.get_start())
-                # circle.add_updater(update_circle_position(vec))
-                # self.add(circle)
-                pass
-
-        # Animate placing vectors
-        self.play(*[GrowArrow(vec) for vec in vecs], run_time=0.5)
-
-        def get_freqs(x): return x[0]
         # Make vectors rotate + move
         for i, (freq, vec) in enumerate(zip(map(get_freqs, vector_info), vecs)):
             vec.add_updater(rotate_constantly(freq))
@@ -250,6 +257,32 @@ class VectorRender(VectorScene):
 
     def get_x_y(self, rad, exp):
         return rad * np.cos(exp), rad * np.sin(exp)
+
+    def draw_plane_axes(self, aspect_ratio):
+        axes = Axes(
+            x_min=-self.max_vector_height,
+            x_max=self.max_vector_height,
+            x_step=1,
+            y_min=-self.max_vector_height*aspect_ratio,
+            y_max=self.max_vector_height*aspect_ratio,
+            y_step=1,
+
+        )
+        self.play(ShowCreation(axes))
+        plane = NumberPlane(
+            background_line_style={  # Faint sub-grid
+                "stroke_color": WHITE,
+                "stroke_width": 0.5,
+                "stroke_opacity": 0.9
+            },
+            x_min=-self.max_vector_height,
+            x_max=self.max_vector_height,
+            x_step=1,
+            y_min=-self.max_vector_height*aspect_ratio,
+            y_max=self.max_vector_height*aspect_ratio,
+            y_step=1,
+        )
+        self.play(ShowCreation(plane))
 
 
 class FadingTail(VGroup):
