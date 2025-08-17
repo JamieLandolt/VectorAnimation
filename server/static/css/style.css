@@ -59,7 +59,8 @@ button {
 
 .container {
     width: 64rem;
-    margin: 0 auto;
+    margin: 2rem auto;
+    padding: 1rem;
 }
 
 .hide {
@@ -119,6 +120,15 @@ header .container:last-child {
 #canvas-section .container .buttons #generate-btn {
     background-color: var(--pastel-green);
     padding: 1rem 3rem;
+}
+
+/* LOADING ***************************************************************************************/
+#loading-section .container {
+    display: flex;
+    justify-content: center;
+    align-items:center;
+    color: var(--light);
+    min-height: 50vh;
 }
 
 /* VIDEO ******************************************************************************************/
