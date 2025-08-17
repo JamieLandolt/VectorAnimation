@@ -115,6 +115,7 @@ window.addEventListener("load", () => {
         const numVectors = parseInt(document.querySelector("#numVectors").value, 10);
         const sortStyle = document.querySelector("#sortStyle").value;
         const sortAscending = document.querySelector("#sortAscending").checked; // .checked returns a boolean
+        const keepTail = document.querySelector("#keepTail").checked;
 
         const n = Math.floor(numVectors / 2);
         let vectorJMin, vectorJMax;
@@ -135,7 +136,8 @@ window.addEventListener("load", () => {
                 "vectorJMin": vectorJMin,
                 "vectorJMax": vectorJMax,
                 "sortStyle": sortStyle,
-                "sortAscending": sortAscending
+                "sortAscending": sortAscending,
+                "keepTail": keepTail
             }
         }
 
