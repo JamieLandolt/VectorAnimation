@@ -62,6 +62,10 @@ button {
     margin: 0 auto;
 }
 
+.hide {
+    display: none;
+}
+
 /* HEADER ****************************************************************************************/
 header {
     width: 100%;
@@ -115,6 +119,18 @@ header .container:last-child {
 #canvas-section .container .buttons #generate-btn {
     background-color: var(--pastel-green);
     padding: 1rem 3rem;
+}
+
+/* VIDEO ******************************************************************************************/
+#video-section .container {
+    display: flex;
+    flex-direction: column;
+    justify-content:center;
+    align-items:center;
+}
+
+#video-section .container video {
+    width: 100%;
 }
 
 /* CONTROLS SECTION ******************************************************************************/
