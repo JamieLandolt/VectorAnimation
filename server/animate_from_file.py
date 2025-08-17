@@ -220,6 +220,9 @@ class VectorRender(ZoomedScene):
         else:
             vectorData.sort_by_speed(asc=params['sortAscending'])
 
+        # Keep tail or not
+        self.keepTail = params['keepTail']
+
         vector_info = vectorData.get_c_vals()
         return vectorData, vector_info
 
@@ -304,7 +307,14 @@ class VectorRender(ZoomedScene):
                 vec.add_updater(update_position(vecs[i - 1]))
 
         # Add path tracing to last vec
-        tail = FadingTail(vecs[-1].get_end, fade_time=15, stroke_width=6,
+        if self.keepTail:
+            tail = TracedPath(
+                traced_point_func = vecs[-1].get_end,
+                stroke_width = 6,
+                stroke_color=ORANGE
+            )
+        else:
+            tail = FadingTail(vecs[-1].get_end, fade_time=15, stroke_width=6,
                           stroke_color=ORANGE, min_distance_to_new_point=0.01)
         self.add(tail)
 

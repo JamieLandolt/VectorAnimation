@@ -9,7 +9,7 @@ window.addEventListener("load", () => {
     function clearCanvas() {
         context.clearRect(0, 0, canvas.width, canvas.height);
         points = [];
-    }   
+    }
 
     function startPosition(e) {
         painting = true;
@@ -17,10 +17,10 @@ window.addEventListener("load", () => {
         clearCanvas();
         const rect = canvas.getBoundingClientRect();
         context.moveTo(e.clientX - rect.left, e.clientY - rect.top);
-    } 
+    }
 
-    function finishPosition() { 
-        painting = false; 
+    function finishPosition() {
+        painting = false;
         context.beginPath();
     }
 
@@ -37,7 +37,7 @@ window.addEventListener("load", () => {
         context.stroke();
         context.beginPath();
         context.moveTo(x, y);
-        
+
         // Add to points array
         points.push({
             x: x,
@@ -62,6 +62,7 @@ window.addEventListener("load", () => {
 
     const generateBtn = document.querySelector("#generate-btn");
     const canvasSection = document.querySelector("#canvas-section");
+    const loadingSection = document.querySelector("#loading-section");
     const videoSection = document.querySelector("#video-section");
     const videoSectionContainer = document.querySelector("#video-section .container");
 
@@ -76,7 +77,7 @@ window.addEventListener("load", () => {
 
         const queryString = new URLSearchParams(params).toString();
         const endpointWithParams = `${endpoint}?${queryString}`;
-        
+
         fetch(endpointWithParams, {
             method: 'GET',
         })
@@ -88,11 +89,12 @@ window.addEventListener("load", () => {
             })
             .then(data => {
                 jobIsDone = data["is_done"];
-                console.log(jobIsDone);
-                if (jobIsDone) {
+
+                if (jobIsDone == true) {
+                    console.log(intervalId);
                     clearInterval(intervalId);
                     intervalId = null;
-                    canvasSection.classList.toggle("hide");
+                    loadingSection.classList.toggle("hide");
                     videoSection.classList.toggle("hide");
 
                     jobId = data["job_id"];
@@ -110,32 +112,34 @@ window.addEventListener("load", () => {
         if (points.length == 0) return;
 
         jobIsDone = false;
-    const numVectors = parseInt(document.querySelector("#numVectors").value, 10);
-    const sortStyle = document.querySelector("#sortStyle").value;
-    const sortAscending = document.querySelector("#sortAscending").checked; // .checked returns a boolean
+        const numVectors = parseInt(document.querySelector("#numVectors").value, 10);
+        const sortStyle = document.querySelector("#sortStyle").value;
+        const sortAscending = document.querySelector("#sortAscending").checked; // .checked returns a boolean
+        const keepTail = document.querySelector("#keepTail").checked;
 
-    const n = Math.floor(numVectors / 2);
-    let vectorJMin, vectorJMax;
+        const n = Math.floor(numVectors / 2);
+        let vectorJMin, vectorJMax;
 
         if (numVectors % 2 === 1) {
-        // If odd (e.g., 41), create a symmetric range like -20 to 20
-        vectorJMin = -n;
-        vectorJMax = n;
-    } else {
-        // If even (e.g., 40), create a nearly symmetric range like -20 to 19
-        vectorJMin = -n;
-        vectorJMax = n - 1;
-    }
-
-         const payload = {
-        "points": points,
-        "render_params": {
-            "vectorJMin": vectorJMin,
-            "vectorJMax": vectorJMax,
-            "sortStyle": sortStyle,
-            "sortAscending": sortAscending
+            // If odd (e.g., 41), create a symmetric range like -20 to 20
+            vectorJMin = -n;
+            vectorJMax = n;
+        } else {
+            // If even (e.g., 40), create a nearly symmetric range like -20 to 19
+            vectorJMin = -n;
+            vectorJMax = n - 1;
         }
-    }
+
+        const payload = {
+            "points": points,
+            "render_params": {
+                "vectorJMin": vectorJMin,
+                "vectorJMax": vectorJMax,
+                "sortStyle": sortStyle,
+                "sortAscending": sortAscending,
+                "keepTail": keepTail
+            }
+        }
 
         fetch(endpoint, {
             method: 'POST',
@@ -152,7 +156,11 @@ window.addEventListener("load", () => {
             })
             .then(data => {
                 jobId = data["job_id"];
-                setInterval(sendJobInfoRequest, 30000);
+                intervalId = setInterval(sendJobInfoRequest, 30000);
+
+                // hide canvas section, show loading section
+                canvasSection.classList.toggle("hide");
+                loadingSection.classList.toggle("hide");
             })
     }
 
