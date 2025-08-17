@@ -4,7 +4,7 @@ import numpy as np
 from typing import List
 import json
 
-# TODO: Zoom, fix circles, Button on website for selecting sort, Button for selecting quality (numVectors)
+# TODO: Zoom, fix circles
 # TODO: Adjust length of video based on number/time of timestamps, Add high quality option on website
 
 def get_average(vals: List[float]) -> float:
@@ -39,7 +39,6 @@ def get_c_j(x_y_vals, j: int) -> float:
 
 
 class VectorData:
-
     def __init__(self, data: List[List[float]]):
         """Data is of the form of a list of x and y tuples/lists"""
         self.data = data
@@ -132,7 +131,7 @@ class VectorRender(ZoomedScene):
         )
 
     def construct(self):
-        self.high_quality = True
+        self.high_quality = False
         self.enable_circles = False
         self.animation_length = 5 if not self.high_quality else 60
 
@@ -184,8 +183,8 @@ class VectorRender(ZoomedScene):
 
         # The zoomed frame (int the top left)
         zoomed_display = self.zoomed_display
-        zoomed_display.set_height(self.max_vector_height * 0.3)
-        zoomed_display.set_width(self.max_vector_height * 0.6)
+        zoomed_display.set_height(self.max_vector_height * 0.4)
+        zoomed_display.set_width(self.max_vector_height * 0.8)
         zoomed_display_frame = zoomed_display.display_frame
         zoomed_display_frame.set_color(WHITE)
 
@@ -212,8 +211,8 @@ class VectorRender(ZoomedScene):
 
         vectorData = VectorData(data)
         vectorData.update_internal_c_vals(
-            params['vectorJMin'] if not self.high_quality else -100,
-            params['vectorJMax'] if not self.high_quality else 100)
+            params['vectorJMin'] if not self.high_quality else -50,
+            params['vectorJMax'] if not self.high_quality else 50)
 
         if params['sortStyle'] == 'size':
             vectorData.sort_by_mag(byLargest=params['sortAscending'])
@@ -240,6 +239,13 @@ class VectorRender(ZoomedScene):
         for i, (freq, (x, y)) in enumerate(vector_info):
             vec_magnitude = np.sqrt((x ** 2) + (y ** 2))
             thickness_scale = lambda x: -(-(np.log(x + 0.5) / np.log(1000)) + 0.4) ** 4 + 0.5
+            def thickness_scale(x):
+                if x > 0.5:
+                    return -(-(np.log(x + 0.5) / np.log(1000)) + 0.4) ** 4 + 0.5
+                else:
+                    return -(-(np.log(x + 0.5) / np.log(1000)) + 0.4) ** 4 + 1.5
+
+
             vec = Vector([x, y, 0], stroke_width=12 * thickness_scale(vec_magnitude / biggest_magnitude),
                          tip_length=vec_magnitude / biggest_magnitude)
 
