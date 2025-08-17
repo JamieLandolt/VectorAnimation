@@ -133,7 +133,7 @@ class VectorRender(ZoomedScene):
     def construct(self):
         self.high_quality = False
         self.enable_circles = False
-        self.animation_length = 35 if not self.high_quality else 60
+        self.animation_length = 5 if not self.high_quality else 60
 
         self.camera.frame_rate = 30 if not self.high_quality else 60
         self.camera.background_color = RED_A
@@ -188,9 +188,6 @@ class VectorRender(ZoomedScene):
         zoomed_display_frame = zoomed_display.display_frame
         zoomed_display_frame.set_color(WHITE)
 
-        # zoomed_display.shift(LEFT * self.max_vector_height / 2.2)
-        # zoomed_display.shift(DOWN * self.max_vector_height / 3.8) # UP 11.5
-        # zoomed_display.to_corner(DL)
         zoomed_display.move_to([-self.max_vector_height + zoomed_display.get_width() / 2 + 0.3,
                                 -self.max_vector_height * self.aspect_ratio + zoomed_display.get_height() / 2 + 0.3, 0])
 
@@ -238,12 +235,11 @@ class VectorRender(ZoomedScene):
         vecs = []
         for i, (freq, (x, y)) in enumerate(vector_info):
             vec_magnitude = np.sqrt((x ** 2) + (y ** 2))
-            thickness_scale = lambda x: -(-(np.log(x + 0.5) / np.log(1000)) + 0.4) ** 4 + 0.5
             def thickness_scale(x):
-                if x > 0.5:
-                    return -(-(np.log(x + 0.5) / np.log(1000)) + 0.4) ** 4 + 0.5
+                if x > 0.2:
+                    return -(-(np.log(x + 0.5) / np.log(1000)) + 0.4) ** 2 + 0.3
                 else:
-                    return -(-(np.log(x + 0.5) / np.log(1000)) + 0.4) ** 4 + 1.5
+                    return -(-(np.log(x + 0.5) / np.log(1000)) + 0.4) ** 2 + 0.5
 
 
             vec = Vector([x, y, 0], stroke_width=12 * thickness_scale(vec_magnitude / biggest_magnitude),
@@ -263,11 +259,8 @@ class VectorRender(ZoomedScene):
 
             if self.enable_circles:
                 # Circumscribe vectors
-                # circle = Circle(radius=get_norm(vec.get_end() - vec.get_start()), color=circle_colours[i], stroke_width=0.8, stroke_opacity=0.8)
-                # circle.move_to(vec.get_start())
-                # circle.add_updater(update_circle_position(vec))
-                # self.add(circle)
-                pass
+                circle = Circle(radius=get_norm(vec.get_end() - vec.get_start()), color=circle_colours[i], stroke_width=0.8, stroke_opacity=0.8)
+                circle.move_to(vec.get_start())
 
         # Animate placing vectors
         self.play(*[GrowArrow(vec) for vec in vecs], run_time=0.5)
@@ -293,11 +286,6 @@ class VectorRender(ZoomedScene):
                     end, end + components
                 )
             return move_vector
-
-        def update_circle_position(vec):
-            def move_circle(mob, dt):
-                mob.move_to(vec.get_start())
-            return move_circle
 
         # Make vectors rotate + move
         for i, (freq, vec) in enumerate(zip(map(get_freqs, vector_info), vecs)):

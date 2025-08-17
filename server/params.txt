@@ -1,1 +1,1 @@
-{"vectorJMin": -20, "vectorJMax": 20, "sortStyle": "speed", "sortAscending": true, "keepTail": true}
+{"vectorJMin": -10, "vectorJMax": 10, "sortStyle": "speed", "sortAscending": true, "keepTail": true}
