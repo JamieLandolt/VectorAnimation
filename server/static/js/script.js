@@ -61,6 +61,11 @@ window.addEventListener("load", () => {
     const endpoint = "http://127.0.0.1:5000/api/job";
 
     const generateBtn = document.querySelector("#generate-btn");
+    const canvasSection = document.querySelector("#canvas-section");
+    const videoSection = document.querySelector("#video-section");
+    const videoSectionContainer = document.querySelector("#video-section .container");
+
+    const videoDirectory = "/media/videos/animate_from_file/1440p60/";
 
     function sendJobInfoRequest() {
         if (jobId == null) return;
@@ -83,9 +88,20 @@ window.addEventListener("load", () => {
             })
             .then(data => {
                 jobIsDone = data["is_done"];
+                console.log(jobIsDone);
                 if (jobIsDone) {
                     clearInterval(intervalId);
                     intervalId = null;
+                    canvasSection.classList.toggle("hide");
+                    videoSection.classList.toggle("hide");
+
+                    jobId = data["job_id"];
+
+                    const videoElement = document.createElement('video');
+                    const videoEndpoint = `http://127.0.0.1:5000/api/job/video?${queryString}`;
+                    videoElement.src = videoEndpoint;
+                    videoElement.controls = true;
+                    videoSectionContainer.appendChild(videoElement);
                 }
             })
     }
@@ -94,10 +110,32 @@ window.addEventListener("load", () => {
         if (points.length == 0) return;
 
         jobIsDone = false;
+    const numVectors = parseInt(document.querySelector("#numVectors").value, 10);
+    const sortStyle = document.querySelector("#sortStyle").value;
+    const sortAscending = document.querySelector("#sortAscending").checked; // .checked returns a boolean
 
-        const payload = {
-            "points": points
+    const n = Math.floor(numVectors / 2);
+    let vectorJMin, vectorJMax;
+
+        if (numVectors % 2 === 1) {
+        // If odd (e.g., 41), create a symmetric range like -20 to 20
+        vectorJMin = -n;
+        vectorJMax = n;
+    } else {
+        // If even (e.g., 40), create a nearly symmetric range like -20 to 19
+        vectorJMin = -n;
+        vectorJMax = n - 1;
+    }
+
+         const payload = {
+        "points": points,
+        "render_params": {
+            "vectorJMin": vectorJMin,
+            "vectorJMax": vectorJMax,
+            "sortStyle": sortStyle,
+            "sortAscending": sortAscending
         }
+    }
 
         fetch(endpoint, {
             method: 'POST',
