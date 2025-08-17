@@ -41,7 +41,7 @@ class Job():
         self.is_done = True
     
     def does_video_exist(self):
-        filepath = "media/videos/animate_from_file/1440p60/VectorRender.mp4"
+        filepath = f"media/videos/animate_from_file/1440p60/{self.id}.mp4"
         return os.path.exists(filepath)
 
 
@@ -96,7 +96,7 @@ class JobApi(Resource):
 class videoApi(Resource):
     def get(self):
         job_id = request.args.get('job_id')
-        video_path = "media/videos/animate_from_file/1440p60/VectorRender.mp4"
+        video_path = f"media/videos/animate_from_file/1440p60/{job_id}.mp4"
         return send_file(video_path, mimetype='video/mp4')
 
 if __name__ == "__main__":
