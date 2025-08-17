@@ -107,7 +107,7 @@ class VectorData:
         return len(self.c_vals)
 
 
-class VectorRender(VectorScene):
+class VectorRender(ZoomedScene):
     CONFIG = {
         "axes_config": {
             "stroke_opacity": 0.4,
@@ -117,22 +117,45 @@ class VectorRender(VectorScene):
         },
     }
 
-    def construct(self):
-        self.high_quality = False
-        self.enable_circles = False
+    def __init__(self, **kwargs):
+        ZoomedScene.__init__(
+            self,
+            zoom_factor=0.1,  # Size of zoom window relative to screen
+            zoomed_display_height=10,  # Height of zoom display
+            zoomed_display_width=20,  # Width of zoom display
+            image_frame_stroke_width=20,
+            zoomed_camera_config={
+                "default_frame_stroke_width": 3,
+                "background_color": BLACK,
+            },
+            **kwargs
+        )
 
-        self.camera.frame_rate = 30
+    def construct(self):
+        self.high_quality = True
+        self.enable_circles = False
+        self.animation_length = 5 if not self.high_quality else 60
+
+        self.camera.frame_rate = 30 if not self.high_quality else 60
         self.camera.background_color = RED_A
 
         vectorData, vector_info = self.get_vector_info()
         self.num_vecs = vectorData.get_num_vectors()
 
-        aspect_ratio = 9/16
-        self.set_fov(vector_info, aspect_ratio)
-        self.draw_plane_axes(aspect_ratio)
+        self.aspect_ratio = 9/16
+        self.set_fov(vector_info, self.aspect_ratio)
+        self.draw_plane_axes()
 
         vecs = self.create_vectors(vector_info)
+        frame = self.zoom_in_on_vectors(vecs[-1])
+
         self.animate_vectors(vector_info, vecs)
+
+        self.wait(self.animation_length / 3)
+        frame.scale(0.5)
+        self.wait(self.animation_length / 3)
+        frame.scale(0.5)
+        self.wait(self.animation_length / 3)
 
     def set_fov(self, vector_info, aspect_ratio):
         # Determine how big frame is
@@ -144,7 +167,40 @@ class VectorRender(VectorScene):
         self.max_vector_height *= 4/5 # This is a random number lol seems to work
 
         self.camera.set_frame_width(2*self.max_vector_height)
-        self.camera.set_frame_height(2*self.max_vector_height*aspect_ratio)
+        self.camera.set_frame_height(2*self.max_vector_height*self.aspect_ratio)
+
+
+    def zoom_in_on_vectors(self, last_vec):
+        def track_last_vector(vec):
+            def move_to_last_vector(mob, dt):
+                mob.move_to(vec.get_end())
+            return move_to_last_vector
+
+        # What should be showed in the zoomed frame
+        frame = self.zoomed_camera.frame
+        frame.move_to(last_vec.get_end())
+        frame.set_color(GREY)
+        frame.add_updater(track_last_vector(last_vec))
+
+        # The zoomed frame (int the top left)
+        zoomed_display = self.zoomed_display
+        zoomed_display.set_height(self.max_vector_height * 0.3)
+        zoomed_display.set_width(self.max_vector_height * 0.6)
+        zoomed_display_frame = zoomed_display.display_frame
+        zoomed_display_frame.set_color(WHITE)
+
+        # zoomed_display.shift(LEFT * self.max_vector_height / 2.2)
+        # zoomed_display.shift(DOWN * self.max_vector_height / 3.8) # UP 11.5
+        # zoomed_display.to_corner(DL)
+        zoomed_display.move_to([-self.max_vector_height + zoomed_display.get_width() / 2 + 0.3,
+                                -self.max_vector_height * self.aspect_ratio + zoomed_display.get_height() / 2 + 0.3, 0])
+
+        # Animate making the frame
+        self.add(frame)
+        self.activate_zooming()
+
+        self.play(self.get_zoomed_display_pop_out_animation())
+        return frame
 
     def get_vector_info(self):
         data = np.load('data.npy')
@@ -180,8 +236,9 @@ class VectorRender(VectorScene):
         vecs = []
         for i, (freq, (x, y)) in enumerate(vector_info):
             vec_magnitude = np.sqrt((x ** 2) + (y ** 2))
-            vec = Vector([x, y, 0], stroke_width=6 * vec_magnitude /
-                                                 biggest_magnitude, tip_length=vec_magnitude / biggest_magnitude * 1)
+            thickness_scale = lambda x: -(-(np.log(x + 0.5) / np.log(1000)) + 0.4) ** 4 + 0.5
+            vec = Vector([x, y, 0], stroke_width=12 * thickness_scale(vec_magnitude / biggest_magnitude),
+                         tip_length=vec_magnitude / biggest_magnitude)
 
             # Shift each vector for the initial drawing
             cumulative_vector_offsets += np.array(
@@ -214,10 +271,9 @@ class VectorRender(VectorScene):
 
         def rotate_constantly(freq):
             def rotate(mob, dt):
-                SPEED_SCALE_FACTOR = 4 / (self.num_vecs)
+                SPEED_SCALE_FACTOR = 2 / (self.num_vecs)
                 mob.rotate(dt * TAU * freq * SPEED_SCALE_FACTOR,
                            about_point=mob.get_start())
-
             return rotate
 
         def update_position(prev_vec):
@@ -227,7 +283,6 @@ class VectorRender(VectorScene):
                 mob.put_start_and_end_on(
                     end, end + components
                 )
-
             return move_vector
 
         def update_circle_position(vec):
@@ -253,18 +308,16 @@ class VectorRender(VectorScene):
                           stroke_color=ORANGE, min_distance_to_new_point=0.01)
         self.add(tail)
 
-        self.wait(40)
-
     def get_x_y(self, rad, exp):
         return rad * np.cos(exp), rad * np.sin(exp)
 
-    def draw_plane_axes(self, aspect_ratio):
+    def draw_plane_axes(self):
         axes = Axes(
             x_min=-self.max_vector_height,
             x_max=self.max_vector_height,
             x_step=1,
-            y_min=-self.max_vector_height*aspect_ratio,
-            y_max=self.max_vector_height*aspect_ratio,
+            y_min=-self.max_vector_height*self.aspect_ratio,
+            y_max=self.max_vector_height*self.aspect_ratio,
             y_step=1,
 
         )
@@ -278,8 +331,8 @@ class VectorRender(VectorScene):
             x_min=-self.max_vector_height,
             x_max=self.max_vector_height,
             x_step=1,
-            y_min=-self.max_vector_height*aspect_ratio,
-            y_max=self.max_vector_height*aspect_ratio,
+            y_min=-self.max_vector_height*self.aspect_ratio,
+            y_max=self.max_vector_height*self.aspect_ratio,
             y_step=1,
         )
         self.play(ShowCreation(plane))
