@@ -118,7 +118,7 @@ class VectorRender(VectorScene):
     }
 
     def construct(self):
-        self.high_quality = True
+        self.high_quality = False
         self.enable_circles = False
 
         self.camera.frame_rate = 30

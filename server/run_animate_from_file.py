@@ -11,7 +11,7 @@ def run_animation(job_id: str = "data", render_params={
     "vectorJMax": 20,  # must be > 0
     "sortStyle": "size",  # can be size or speed
     "sortAscending": True,  # true or false
-}, manim_params='-p -l --frame_rate 15'):
+}, manim_params='-p -l'):
     data = np.load(f'points/{job_id}.npy')
     data = np.array([[(row[0]-450)/20, (-row[1]+350)/20] for row in data])
     # Write to file read from
