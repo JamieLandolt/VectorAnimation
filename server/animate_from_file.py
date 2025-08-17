@@ -133,7 +133,7 @@ class VectorRender(ZoomedScene):
     def construct(self):
         self.high_quality = False
         self.enable_circles = False
-        self.animation_length = 5 if not self.high_quality else 60
+        self.animation_length = 35 if not self.high_quality else 60
 
         self.camera.frame_rate = 30 if not self.high_quality else 60
         self.camera.background_color = RED_A
