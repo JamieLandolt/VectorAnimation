@@ -1,4 +1,5 @@
 Fourier Series Vector Animations by the Fourier Four (Jamie, John, Jasper & Will)
+Made for the 2025 UQCS Hackathon
 
 Tech Stack:
 Python
