@@ -1,15 +1,17 @@
-Fourier Series Vector Animations by the Fourier Four (Jamie, John, Jasper & Will)
-Made for the 2025 UQCS Hackathon
+**Fourier Series Vector Animations by the Fourier Four (Jamie, John, Jasper & Will)**
+*Made for the 2025 UQCS Hackathon*
 
-Tech Stack:
-Python
+## Tech Stack:
+### Python
 - Flask & Flask_Restx (Web) (John)
 - Manim & ManimLib (Animations) (Jamie)
 - Numpy (Math) (Jasper)
 
+## Overview
 This project allows anyone to draw an image which will then be recreated by stacked rotating vectors.
 The catch is that all vectors are rotating at predetermined constant rates and the only thing we control is the size of each vector.
 
+## How it Works?
 There are three core components in the functionality pipeline:
 - Website
   - The user draws an image
@@ -23,6 +25,6 @@ There are three core components in the functionality pipeline:
   - At each frame, move the base of the k+1th vector to the tip of the kth vector and rotate the kth vector based on the kth frequency and the time passed since the last frame
 And Thats It!
 
-Whiteboard explanation (More in depth on the maths): (Will)
+### Whiteboard explanation (More in depth on the maths): (Will)
 ![IMG_7118](https://github.com/user-attachments/assets/0a3171e3-1219-42ba-aba3-402e3eb5832c)
 
