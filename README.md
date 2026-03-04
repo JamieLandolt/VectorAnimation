@@ -1,6 +1,5 @@
 # Fourier Series Vector Animations by the Fourier Four (Jamie, John, Jasper & Will)
 *Made for the 2025 UQCS Hackathon*
-<img width="1430" height="803" alt="Screenshot 2026-03-04 at 11 00 29 am" src="https://github.com/user-attachments/assets/ef9f4789-4590-47bc-80f7-a128c2fb2329" />
 
 https://github.com/user-attachments/assets/7543ee8c-98b4-4891-a4a2-186fa98f4d6f
 
